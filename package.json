@@ -1,0 +1,19 @@
+{
+  "name": "dfe-proyecto-parcial-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tail":"npx tailwindcss -i ./src/assets/css/input.css -o ./src/assets/css/dist/output.css --watch",
+    "serve": "live-server src",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"concurrently \"npm run tail\" \"npm run serve\""
+  },
+  "author": "Angel Roberto Moreno Laines",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.3.3",
+    "concurrently": "^8.2.1",
+    "live-server": "^1.2.2"
+  }
+}
