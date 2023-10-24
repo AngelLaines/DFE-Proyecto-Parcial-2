@@ -7,6 +7,7 @@ const administrarTareaDiv = document.getElementById('tareas');
 const alerta = document.getElementById('alert');
 const modal = document.getElementById('modal');
 const divModal = document.getElementById('divModal');
+
 const modalClass = "fixed bg-opacity-80 w-full h-full top-0 transition ease-in-out duration-500 flex flex-col items-center";
 const divModalClass = 'relative -top-full bg-slate-50 w-2/4 transition-all ease-in-out duration-500 rounded-md';
 console.log(data);
@@ -33,12 +34,22 @@ cancelModal.addEventListener('click', cerrarModal);
 const guardarInformacion = document.getElementById('guardar');
 guardarInformacion.addEventListener('click', (e) => {
     e.preventDefault();
+    if (document.getElementById('update').value === "editar") {
+        const idTask = document.getElementById('id').value;
+        administrarTareaDiv.innerHTML = '';
+        putTask(idTask);
+        limpiarForm();
+        guardarInformacion.value = "Guardar";
+        return;
+    }
     postTask();
+    limpiarForm();
 });
 
 modal.addEventListener('click', cerrarModal);
 
 administrarTareaDiv.addEventListener('click', async e => {
+    limpiarForm();
     if (e.target.classList.contains('eliminar')) {
         modal.className = modalClass;
         modal.className += ' visible bg-black';
@@ -50,11 +61,67 @@ administrarTareaDiv.addEventListener('click', async e => {
         modal.querySelector('span').innerHTML = title;
         console.log(e.target.getAttribute('data-id'), 'eliminar');
     } else if (e.target.classList.contains('editar')) {
+
+        let title = document.getElementById('titulo');
+        let description = document.getElementById('descripcion');
+        let completed = document.getElementById('completado');
+        let priority = document.getElementById('alta');
+        let dueDate = document.getElementById('fecha');
+
         console.log(e.target.getAttribute('data-id'), 'editar');
+        const idTask = e.target.getAttribute('data-id');
+        const result = await fetchApi.getById(idTask);
+        console.log(result);
+
+        document.getElementById('update').value = "editar";
+        document.getElementById('id').value = idTask;
+        guardarInformacion.value = 'Editar Cambios'
+        title.value = result.title;
+        description.value = result.description;
+        completed.checked = result.completed;
+        priority.value = result.priority;
+        dueDate.value = result.dueDate;
     }
 });
 
 /// Functiones ///
+
+function limpiarForm() {
+    document.querySelector('form').reset();
+}
+
+async function putTask(id) {
+    let title = document.getElementById('titulo');
+    let description = document.getElementById('descripcion');
+    let completed = document.getElementById('completado');
+    let priority = document.getElementById('alta');
+    let dueDate = document.getElementById('fecha');
+    if (title.value !== '' ||
+        description.value !== '' ||
+        priority.value !== '' ||
+        dueDate.value !== '') {
+        console.log({ title, description, completed, priority, dueDate });
+        dueDate = (new Date(dueDate.value)).toISOString().substring(0, 10);
+
+        const body = {
+            title: title.value,
+            description: description.value,
+            completed: completed.checked,
+            priority: priority.value,
+            tag: "DFE 2023-2",
+            dueDate: dueDate
+        };
+        console.log(body);
+        await fetchApi.put(id, body);
+        const data = await fetchApi.getAll();
+        data.forEach(task => {
+            inyect(task);
+        });
+        messageAlert('Datos editados correctamente', 'bg-green-500');
+    } else {
+        messageAlert('Faltan campos por rellenar', 'bg-red-500');
+    }
+}
 
 function evalData(data) {
     if (data.length > 0) {
@@ -146,31 +213,30 @@ function changeClasses() {
     }, 500);
 }
 async function postTask() {
-
-    const title = document.getElementById('titulo').value;
-    const description = document.getElementById('descripcion').value;
-    const completed = document.getElementById('completado').checked;
-    const priority = document.getElementById('alta').value;
-    let dueDate = document.getElementById('fecha').value;
-
-    if (title !== '' ||
-        description !== '' ||
-        priority !== '' ||
-        dueDate !== '') {
+    let title = document.getElementById('titulo');
+    let description = document.getElementById('descripcion');
+    let completed = document.getElementById('completado');
+    let priority = document.getElementById('alta');
+    let dueDate = document.getElementById('fecha');
+    if (title.value !== '' ||
+        description.value !== '' ||
+        priority.value !== '' ||
+        dueDate.value !== '') {
         console.log({ title, description, completed, priority, dueDate });
-        dueDate = (new Date(dueDate)).toISOString().substring(0, 10);
+        dueDate = (new Date(dueDate.value)).toISOString().substring(0, 10);
 
         const body = {
-            title: title,
-            description: description,
-            completed: completed,
-            priority: priority,
+            title: title.value,
+            description: description.value,
+            completed: completed.checked,
+            priority: priority.value,
             tag: "DFE 2023-2",
             dueDate: dueDate
         };
         console.log(body);
         const result = await fetchApi.post(body);
         console.log(result);
+        document.getElementById('sin-tareas').setAttribute('hidden', null);
         messageAlert('Datos guardados correctamente', 'bg-green-500');
         inyect(result);
     } else {
