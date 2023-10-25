@@ -66,6 +66,7 @@ administrarTareaDiv.addEventListener('click', async e => {
         let description = document.getElementById('descripcion');
         let completed = document.getElementById('completado');
         let priority = document.getElementById('alta');
+        let tag = document.getElementById('tag');
         let dueDate = document.getElementById('fecha');
 
         console.log(e.target.getAttribute('data-id'), 'editar');
@@ -79,6 +80,7 @@ administrarTareaDiv.addEventListener('click', async e => {
         title.value = result.title;
         description.value = result.description;
         completed.checked = result.completed;
+        tag.value = result.tag;
         priority.value = result.priority;
         dueDate.value = result.dueDate;
     }
@@ -95,11 +97,13 @@ async function putTask(id) {
     let description = document.getElementById('descripcion');
     let completed = document.getElementById('completado');
     let priority = document.getElementById('alta');
+    let tag = document.getElementById('tag');
     let dueDate = document.getElementById('fecha');
     if (title.value !== '' ||
         description.value !== '' ||
         priority.value !== '' ||
-        dueDate.value !== '') {
+        dueDate.value !== '' ||
+        tag.value !== '') {
         console.log({ title, description, completed, priority, dueDate });
         dueDate = (new Date(dueDate.value)).toISOString().substring(0, 10);
 
@@ -108,7 +112,7 @@ async function putTask(id) {
             description: description.value,
             completed: completed.checked,
             priority: priority.value,
-            tag: "DFE 2023-2",
+            tag: tag.value,
             dueDate: dueDate
         };
         console.log(body);
@@ -162,7 +166,7 @@ function inyect(task) {
             </span>
         </p>
 
-        <p class="font-bold mb-3 text-gray-700 uppercase">Etiqueta:
+        <p class="font-bold mb-3 text-gray-700 uppercase">Clasificación:
             <span class="font-normal normal-case">
                 ${task.tag}
             </span>
@@ -217,12 +221,15 @@ async function postTask() {
     let description = document.getElementById('descripcion');
     let completed = document.getElementById('completado');
     let priority = document.getElementById('alta');
+    let tag = document.getElementById('tag');
     let dueDate = document.getElementById('fecha');
     if (title.value !== '' ||
         description.value !== '' ||
         priority.value !== '' ||
-        dueDate.value !== '') {
-        console.log({ title, description, completed, priority, dueDate });
+        dueDate.value !== '' ||
+        tag.value !== '') {
+        //console.log({ title, description, completed, priority, dueDate });
+        console.log(dueDate.value);
         dueDate = (new Date(dueDate.value)).toISOString().substring(0, 10);
 
         const body = {
@@ -230,7 +237,7 @@ async function postTask() {
             description: description.value,
             completed: completed.checked,
             priority: priority.value,
-            tag: "DFE 2023-2",
+            tag: tag.value,
             dueDate: dueDate
         };
         console.log(body);
